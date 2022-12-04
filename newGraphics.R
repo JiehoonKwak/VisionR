@@ -94,10 +94,14 @@ var.list = syms(names(d.2)[l])
 plot.list = lapply(var.list, myplot2, data = d.2[d.2$pibar != "etc",])
 grid.arrange(grobs = plot.list, nrow =4)
 
-# Errorvar 추가하기 - input = "var"
-
-names(d.2)[l]
-view(d.2)
-
-
+# Clinical model
+comparePI = function(df, var){
+  pre = df %>% group_by(id) %>% filter(visitrank == "Initial") %>% select(id, sym(var))
+  post = df %>% group_by(id) %>% filter(visitrank == "Last") %>% select(id, sym(var))
+  temp = merge(pre,post, by = "id")
+  temp[paste0("diff",var)] = temp[3] - temp[2]
+  return(arrange(temp[,c(1,4)], desc(temp[,4])))
+}
+comparePI(d.2, 'LV')
+comparePI(d.2, 'ACD')
 
